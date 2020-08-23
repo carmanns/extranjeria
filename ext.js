@@ -20,11 +20,15 @@ var fs = require("fs");
 
 // Speed up the mouse.
 robot.setMouseDelay(250);
-robot.setKeyboardDelay(450);
-append(ahora()); // LOG
-let pausa = 4000;
+robot.setKeyboardDelay(550);
 
-function ahora() {
+let size = robot.getScreenSize();
+console.log("Pantalla: ");
+console.log(size);
+
+let pausa = 500;
+
+function ahora(txt) {
   let date_ob = new Date();
 
   // current date
@@ -51,8 +55,9 @@ function ahora() {
   
   // prints date & time in YYYY-MM-DD HH:MM:SS format
   let ahora = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
-  console.log(ahora);
-  return ahora;
+  let log = ahora + ": " + txt;
+  console.log(log);
+  return log;
 }
 
 function append(text) {
@@ -100,7 +105,6 @@ function getDatosSolicitud() {
 
   console.log('esperamos ' + (pausa/1000) + ' segundos..');
   sleep.msleep(pausa); // Cambio de página
-  console.log('4');
 }
 
 function getDatosSolicitante() { 
@@ -111,6 +115,8 @@ function getDatosSolicitante() {
   robot.keyTap('pagedown');
   robot.moveMouse(100, 1350);
   robot.mouseClick();
+  console.log('esperamos ' + (pausa/1000) + ' segundos..');
+  sleep.msleep(pausa); // Cambio de página
 
   // CUARTA PANTALLA - FINAL PASO 1
   // Hacemos clicks en los autorellenos del pasaporte y nombre, es más rápido.
@@ -142,8 +148,20 @@ function iniciarSolicitud() {
   robot.moveMouse(80, 550);
   robot.mouseClick();
 
+  // var img = robot.screen.capture(0, 230, 500, 300);
+  var x = 105;
+  var y = 565;
+  robot.moveMouse(x, y);
+  var punto =  robot.getPixelColor(x, y);
+  console.log(punto);
 
-  // setTimeout(continuarSolicitud, 1000);
+  if (punto === '0091aa') {
+    append(ahora('En este momento no hay citas disponibles: ' + punto)); // LOG
+    robot.moveMouse(105, 660);
+    robot.mouseClick();
+  } else {
+    append(ahora('HAY Oficinas: ' + punto)); // LOG
+  }
 }
 
 // INICIO
