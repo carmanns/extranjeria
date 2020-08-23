@@ -15,7 +15,14 @@
 
 // Move the mouse across the screen as a sine wave.
 var robot = require("robotjs");
+var sleep = require('sleep');
 var fs = require("fs");
+
+// Speed up the mouse.
+robot.setMouseDelay(250);
+robot.setKeyboardDelay(450);
+append(ahora()); // LOG
+let pausa = 4000;
 
 function ahora() {
   let date_ob = new Date();
@@ -54,14 +61,14 @@ function append(text) {
   });
 }
 
-function getDatosSolicitud() {
-  console.log('1.- Obtener datos para la solicitud.');
-  append(ahora());
+function continuar() {
+  console.log('Press any key to continue.');
+  var fd = fs.openSync("/dev/stdin", "rs");
+  fs.readSync(fd, Buffer.alloc(1), 0, 1);
+  fs.closeSync(fd);
+}
 
-  // Speed up the mouse.
-  robot.setMouseDelay(250);
-  robot.setKeyboardDelay(550);
-  
+function getDatosSolicitud() {
   // Abrir página
   // Move the mouse to x 20, y 90 on the screen.
   // robot.keyTap('pageup');
@@ -76,12 +83,12 @@ function getDatosSolicitud() {
   robot.keyTap('enter');
   robot.keyTap('tab');
   robot.keyTap('enter');
-  
+
   // Aceptar primera pantalla
   // robot.moveMouse(100, 510);
   // robot.mouseClick();
-  
-  // SEGUNDA PANTALLA: selección del trámite
+
+   // Selección del trámite
   // Al entrar, ya toma el desplegable resaltado: usamos combinaciones de teclas
   // Desplegable de trámites
   robot.keyTap('space');
@@ -90,8 +97,15 @@ function getDatosSolicitud() {
   // Botón Aceptar
   robot.keyTap('tab');
   robot.keyTap('enter');
+
+  console.log('esperamos ' + (pausa/1000) + ' segundos..');
+  sleep.msleep(pausa); // Cambio de página
+  console.log('4');
+}
+
+function getDatosSolicitante() { 
   
-  // TERCERA PANTALLA: Resumen trámite
+  // SEGUNDA PANTALLA: Resumen trámite
   // buscamos el botón entrar, abajo
   // Accedemos con tabs inversos porque está muy abajo
   robot.keyTap('pagedown');
@@ -99,6 +113,7 @@ function getDatosSolicitud() {
   robot.mouseClick();
 
   // CUARTA PANTALLA - FINAL PASO 1
+  // Hacemos clicks en los autorellenos del pasaporte y nombre, es más rápido.
   robot.moveMouse(400, 495);
   robot.mouseClick();
   robot.moveMouse(320, 550);
@@ -110,35 +125,34 @@ function getDatosSolicitud() {
   robot.moveMouse(320, 920);
   robot.mouseClick();
   
-  // robot.typeString('FU425637');
+  // robot.typeString('pasaporte');
   // robot.keyTap('tab');
-  // robot.typeString('NATALIIA VOLKOVA');
+  // robot.typeString('nombre');
   // robot.keyTap('tab');
   // robot.keyTap('space');
   // robot.keyTap('tab');
+
+  // Apuntamos el captcha
+  robot.moveMouse(280, 1120);
+  console.log('captcha');
 }
 
 function iniciarSolicitud() {
-  console.log('2.- Iniciar solicitud');
+  console.log('2.- Iniciar solicitud. Después aceptar el Captcha.');
   robot.moveMouse(80, 550);
   robot.mouseClick();
-  setTimeout(continuarSolicitud, 1000);
+
+
+  // setTimeout(continuarSolicitud, 1000);
 }
 
-function continuarSolicitud() {
-  robot.moveMouse(80, 660);
-  robot.mouseClick();
-
-}
-
-getDatosSolicitud();
-
-console.log('Press any key to continue.');
-var fd = fs.openSync("/dev/stdin", "rs");
-fs.readSync(fd, Buffer.alloc(1), 0, 1);
-fs.closeSync(fd);
-
-iniciarSolicitud();
+// INICIO
+//============================================
+console.log('1.- Obtener datos para la solicitud. Antes del Captcha.');
+getDatosSolicitud(); // Antes del Captcha
+getDatosSolicitante();
+continuar();
+iniciarSolicitud(); // Después del Captcha
 
 console.log('The End');
 

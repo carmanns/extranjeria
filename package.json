@@ -1,5 +1,11 @@
 {
+  "name": "extranjeria",
+  "version": "0.0.1",
+  "description": "",
+  "main": "ext.js",
+  "author": "",
   "dependencies": {
-    "robotjs": "^0.6.0"
+    "robotjs": "^0.6.0",
+    "sleep": "^6.3.0"
   }
 }
